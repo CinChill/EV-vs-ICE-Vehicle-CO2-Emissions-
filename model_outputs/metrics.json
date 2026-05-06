@@ -1,0 +1,169 @@
+{
+  "data_path": "cleaned_EV_vs_ICE_vehicle_specs.csv",
+  "output_directory": "model_outputs",
+  "rows": 15301,
+  "features": [
+    "Year",
+    "Engine_Cylinders",
+    "Engine_Size_L",
+    "City_MPG",
+    "Highway_MPG",
+    "Combined_MPG",
+    "EV_Range_miles",
+    "Make",
+    "Fuel_Type",
+    "Drivetrain",
+    "Transmission_Type"
+  ],
+  "test_size": 0.2,
+  "random_state": 42,
+  "n_estimators": 300,
+  "vehicle_category_distribution": {
+    "ICE (Gas)": 13589,
+    "EV": 1361,
+    "ICE (Diesel)": 308,
+    "Hybrid/Other": 42,
+    "CNG": 1
+  },
+  "fuel_type_distribution": {
+    "Premium Gasoline": 7020,
+    "Regular Gasoline": 6443,
+    "Electricity": 1361,
+    "Diesel": 308,
+    "Midgrade Gasoline": 126,
+    "Hydrogen": 41,
+    "Natural Gas": 1,
+    "Unknown": 1
+  },
+  "vehicle_category_classifier": {
+    "rows_used": 15300,
+    "rows_skipped_for_rare_labels": 1,
+    "skipped_labels": {
+      "CNG": 1
+    },
+    "target_distribution": {
+      "ICE (Gas)": 13589,
+      "EV": 1361,
+      "ICE (Diesel)": 308,
+      "Hybrid/Other": 42
+    },
+    "used_stratified_split": true,
+    "macro_f1": 1.0,
+    "weighted_f1": 1.0,
+    "classification_report": {
+      "EV": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 272.0
+      },
+      "Hybrid/Other": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 8.0
+      },
+      "ICE (Diesel)": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 62.0
+      },
+      "ICE (Gas)": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 2718.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 3060.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 3060.0
+      }
+    },
+    "model_path": "model_outputs\\vehicle_category_model.joblib"
+  },
+  "co2_regression": {
+    "rows_used": 15301,
+    "mae": 2.3486364795007084,
+    "rmse": 4.853671226069279,
+    "r2": 0.9989905215839651,
+    "model_path": "model_outputs\\co2_regression_model.joblib"
+  },
+  "impact_level_distribution": {
+    "Medium": 6340,
+    "High": 5660,
+    "Zero tailpipe": 1403,
+    "Very high": 1109,
+    "Low": 789
+  },
+  "environmental_impact_classifier": {
+    "rows_used": 15301,
+    "rows_skipped_for_rare_labels": 0,
+    "skipped_labels": {},
+    "target_distribution": {
+      "Medium": 6340,
+      "High": 5660,
+      "Zero tailpipe": 1403,
+      "Very high": 1109,
+      "Low": 789
+    },
+    "used_stratified_split": true,
+    "macro_f1": 0.9731920813836592,
+    "weighted_f1": 0.9786513197103793,
+    "classification_report": {
+      "High": {
+        "precision": 0.9786476868327402,
+        "recall": 0.9717314487632509,
+        "f1-score": 0.975177304964539,
+        "support": 1132.0
+      },
+      "Low": {
+        "precision": 0.9512195121951219,
+        "recall": 0.9873417721518988,
+        "f1-score": 0.968944099378882,
+        "support": 158.0
+      },
+      "Medium": {
+        "precision": 0.9951768488745981,
+        "recall": 0.9763406940063092,
+        "f1-score": 0.9856687898089171,
+        "support": 1268.0
+      },
+      "Very high": {
+        "precision": 0.8870967741935484,
+        "recall": 0.990990990990991,
+        "f1-score": 0.9361702127659575,
+        "support": 222.0
+      },
+      "Zero tailpipe": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 281.0
+      },
+      "accuracy": 0.9784384188173799,
+      "macro avg": {
+        "precision": 0.9624281644192016,
+        "recall": 0.9852809811824901,
+        "f1-score": 0.9731920813836592,
+        "support": 3061.0
+      },
+      "weighted avg": {
+        "precision": 0.9793994095607479,
+        "recall": 0.9784384188173799,
+        "f1-score": 0.9786513197103793,
+        "support": 3061.0
+      }
+    },
+    "model_path": "model_outputs\\environmental_impact_model.joblib"
+  }
+}

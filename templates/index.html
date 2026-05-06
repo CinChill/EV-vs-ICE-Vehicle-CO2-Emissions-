@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EV / ICE Prediction Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Vehicle technical specs</p>
+        <h1>EV / ICE Prediction Dashboard</h1>
+      </div>
+      <div class="status-pill {{ 'ready' if status.ready else 'missing' }}" id="modelStatus">
+        <span class="status-dot"></span>
+        <span>{{ 'Models ready' if status.ready else 'Models missing' }}</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      {% if not status.ready %}
+      <section class="setup-panel" id="setupPanel">
+        <div>
+          <h2>Model files were not found</h2>
+          <p>Run the training command first, then refresh this page.</p>
+        </div>
+        <code>{{ status.train_command }}</code>
+      </section>
+      {% endif %}
+
+      <section class="tool-grid">
+        <form class="input-panel" id="predictionForm">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Input</p>
+              <h2>Technical specifications</h2>
+            </div>
+            <div class="preset-row" role="group" aria-label="Vehicle presets">
+              <button type="button" class="icon-button" data-preset="ev" title="EV preset">EV</button>
+              <button type="button" class="icon-button" data-preset="gas" title="Gasoline preset">Gas</button>
+              <button type="button" class="icon-button" data-preset="diesel" title="Diesel preset">Diesel</button>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              <span>Make</span>
+              <select name="Make">
+                {% for value in options.categorical.Make %}
+                <option value="{{ value }}" {% if value == options.defaults.Make %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label>
+              <span>Year</span>
+              <input name="Year" type="number" min="{{ options.year_min }}" max="{{ options.year_max }}" step="1" value="{{ options.defaults.Year|int }}">
+            </label>
+
+            <label>
+              <span>Fuel type</span>
+              <select name="Fuel_Type">
+                {% for value in options.categorical.Fuel_Type %}
+                <option value="{{ value }}" {% if value == options.defaults.Fuel_Type %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label>
+              <span>Cylinders</span>
+              <input name="Engine_Cylinders" type="number" min="0" max="16" step="1" value="{{ '%.0f'|format(options.defaults.Engine_Cylinders) }}">
+            </label>
+
+            <label>
+              <span>Engine size L</span>
+              <input name="Engine_Size_L" type="number" min="0" max="9" step="0.1" value="{{ '%.1f'|format(options.defaults.Engine_Size_L) }}">
+            </label>
+
+            <label>
+              <span>Drivetrain</span>
+              <select name="Drivetrain">
+                {% for value in options.categorical.Drivetrain %}
+                <option value="{{ value }}" {% if value == options.defaults.Drivetrain %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label>
+              <span>City MPG</span>
+              <input name="City_MPG" type="number" min="0" max="160" step="1" value="{{ '%.0f'|format(options.defaults.City_MPG) }}">
+            </label>
+
+            <label>
+              <span>Highway MPG</span>
+              <input name="Highway_MPG" type="number" min="0" max="160" step="1" value="{{ '%.0f'|format(options.defaults.Highway_MPG) }}">
+            </label>
+
+            <label>
+              <span>Combined MPG</span>
+              <input name="Combined_MPG" type="number" min="0" max="160" step="1" value="{{ '%.0f'|format(options.defaults.Combined_MPG) }}">
+            </label>
+
+            <label>
+              <span>EV range miles</span>
+              <input name="EV_Range_miles" type="number" min="0" max="600" step="1" value="{{ '%.0f'|format(options.defaults.EV_Range_miles) }}">
+            </label>
+
+            <label>
+              <span>Transmission</span>
+              <select name="Transmission_Type">
+                {% for value in options.categorical.Transmission_Type %}
+                <option value="{{ value }}" {% if value == options.defaults.Transmission_Type %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label>
+              <span>Annual km</span>
+              <input name="Annual_KM" type="number" min="0" max="100000" step="500" value="{{ '%.0f'|format(options.defaults.Annual_KM) }}">
+            </label>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="primary-button" {% if not status.ready %}disabled{% endif %}>
+              Predict
+            </button>
+            <button type="reset" class="secondary-button">Reset</button>
+          </div>
+        </form>
+
+        <section class="results-panel" aria-live="polite">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Result</p>
+              <h2>Model output</h2>
+            </div>
+          </div>
+
+          <div class="empty-state" id="emptyState">
+            <p>Enter a vehicle profile and run a prediction.</p>
+          </div>
+
+          <div class="result-stack hidden" id="resultStack">
+            <div class="metric-row">
+              <article class="metric-card">
+                <span class="metric-label">Category</span>
+                <strong id="categoryResult">-</strong>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">CO2</span>
+                <strong><span id="co2Result">-</span> g/mile</strong>
+              </article>
+            </div>
+
+            <div class="impact-card" id="impactCard">
+              <div>
+                <span class="metric-label">Environmental impact</span>
+                <strong id="impactResult">-</strong>
+              </div>
+              <div class="impact-meter">
+                <span></span>
+              </div>
+            </div>
+
+            <div class="metric-row">
+              <article class="metric-card">
+                <span class="metric-label">Annual CO2</span>
+                <strong><span id="annualCo2Result">-</span> kg</strong>
+              </article>
+              <article class="metric-card">
+                <span class="metric-label">5-year CO2</span>
+                <strong><span id="fiveYearCo2Result">-</span> kg</strong>
+              </article>
+            </div>
+
+            <section class="probability-panel">
+              <h3>Category probabilities</h3>
+              <div id="categoryProbabilities" class="bars"></div>
+            </section>
+
+            <section class="probability-panel">
+              <h3>Impact probabilities</h3>
+              <div id="impactProbabilities" class="bars"></div>
+            </section>
+          </div>
+
+          <div class="error-box hidden" id="errorBox"></div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      window.vehicleOptions = {{ options|tojson }};
+      window.modelStatus = {{ status|tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

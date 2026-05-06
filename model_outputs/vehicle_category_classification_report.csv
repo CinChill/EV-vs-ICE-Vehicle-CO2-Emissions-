@@ -1,0 +1,8 @@
+,precision,recall,f1-score,support
+EV,1.0,1.0,1.0,272.0
+Hybrid/Other,1.0,1.0,1.0,8.0
+ICE (Diesel),1.0,1.0,1.0,62.0
+ICE (Gas),1.0,1.0,1.0,2718.0
+accuracy,1.0,1.0,1.0,
+macro avg,1.0,1.0,1.0,3060.0
+weighted avg,1.0,1.0,1.0,3060.0
